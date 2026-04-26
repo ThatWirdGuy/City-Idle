@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>City idle</title>
+    <meta name="description" content="City building game with fully simulated citizens!
+You start with nothing, you create fire and people start gathering, build huts and a civilization begins! From here you travel through different time periods from prehistoric to bronze age to iron age and so on.
+Initially starting with basics like collect berries, growing crops and animals, improving efficiency with tools. Eventually create ships to colonize many more islands to grow your empire!
+"/>
+    <meta charset="utf-8"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#000000"/>
+    <link rel="icon" href="/load/favicon.ico"/>
+    <link rel="manifest" href="/manifest.json"/>
+    <link href="/loading.css" type="text/css" rel="stylesheet"/>
+    <script type="text/javascript">
+
+        const HostingLocation = Object.freeze({
+            kongregate: "kongregate",
+            armorGames: "armorGames",
+            steam: "steam",
+            crazyGames: "crazyGames",
+            itch: "itch",
+            poki: "poki",
+            facebook: "facebook",
+            localhost: "localhost",
+            grestGames: "grestGames",
+        })
+
+        // NB! THESE VALUES ALSO EXIST IN TYPESCRIPT CODE!
+        const identifySite = () => {
+            const params = new URL(window.location.href).searchParams;
+            const src = params.get("src")?.toLowerCase();
+            if (src === HostingLocation.kongregate.toLowerCase() || params.get('kongregate_user_id')) {
+                return HostingLocation.kongregate
+            } else if (src === HostingLocation.armorGames.toLowerCase() || document.location.hostname.indexOf("armorgames.com") !== -1) {
+                return HostingLocation.armorGames
+            } else if (src === HostingLocation.steam.toLowerCase()) {
+                return HostingLocation.steam
+            } else if (src === HostingLocation.crazyGames.toLowerCase()) {
+                return HostingLocation.crazyGames
+            } else if (src === HostingLocation.itch.toLowerCase()) {
+                return HostingLocation.itch
+            } else if (src === HostingLocation.poki.toLowerCase()) {
+                return HostingLocation.poki
+            } else if (src === HostingLocation.facebook.toLowerCase() || document.location.ancestorOrigins?.contains("https://www.facebook.com")) {
+                return HostingLocation.facebook
+            } else if (src !== HostingLocation.grestGames.toLowerCase() && (String(window.location.href).search('http://localhost') === 0 || String(window.location.href).search("http://127.0.0.1") === 0)) {
+                return HostingLocation.localhost
+            } else {
+                return HostingLocation.grestGames
+            }
+        }
+
+        // ----------------------------------
+        // IMPORTANT CONSTANTS
+        // ----------------------------------
+
+        const STEAM_LINK = "https://store.steampowered.com/app/2282020/City_idle/"
+        const MAIN_SITE_LINK = "https://cityidle.com"
+        const SECONDARY_SITE_LINK = "https://embedded.cityidle.com"
+        const STEAM_RELEASED = true
+        const SITE = identifySite()
+        const HASH = "xgvh6ref"
+        const VERSION = "1.0.213"
+        const ALLOW_FIREFOX = true;
+        const ALLOW_SAFARI = false;
+        const showSteamRef = () => {
+            // You could add sites here where we don't want to show any links to steam.
+            return SITE !== HostingLocation.kongregate
+        }
+
+        // ----------------------------------
+        // ----------------------------------
+        // ----------------------------------
+        console.log("VERSION: " + eval("VERSION"));
+        document.getElementsByTagName("title")[0].innerText = "City idle - " + SITE;
+    </script>
+  <script type="module" crossorigin src="/assets/index-4584b28f.js"></script>
+  <link rel="stylesheet" href="/assets/index-59ba68e4.css">
+</head>
+<body oncontextmenu="return false">
+
+<div id="root" style="height: 100%;">
+    <div class="loadingBg" id="initialLoaderBg">
+        <div class="loading">
+            <div style='text-align:center;'>
+                <img src='./load/gameLogo.png' width="231" height="87" style='border-radius: 10px; margin: 0 0 18px 0;'/>
+            </div>
+            <div class="loadingContentBox" id="loader">
+                <div style="height: 45px;">
+                    <div class="cssload-contain" style="position:relative; top: 30px; left: 20px;">
+                        <div class="cssload-dot"></div>
+                        <div class="cssload-dot"></div>
+                        <div class="cssload-dot"></div>
+                        <div class="cssload-dot"></div>
+                        <div class="cssload-dot"></div>
+                    </div>
+                </div>
+                <div>Loading... hold on...</div>
+            </div>
+            <div class="message" id="loadingMessage">
+                <div class="loadingContentBox" style="color:gray;">
+                    City building game with fully simulated citizens!<br/><br/>
+                    You start with nothing, you create fire and people start gathering, build huts and a civilization begins! From here you travel through different
+                    time periods from prehistoric to bronze age to iron age and so on.<br/><br/>
+                    Initially starting with basics like collect berries, growing crops and animals, improving efficiency with tools.
+                    Eventually create ships to colonize many more islands to grow your empire!
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        // -------------------------
+        // This keeps focus on the game, so keyboard events would work.
+        const body = document.getElementsByTagName("body")[0];
+        body.addEventListener("mouseenter", () => {
+            window.focus({preventScroll: true})
+        });
+        body.addEventListener("load", () => {
+            window.focus()
+        });
+
+        // -------------------------
+        // This is needed for steam APP
+        let STEAM_PORT;
+        window.addEventListener("message", ev => {
+            if (ev.data === 'steamworks-port') {
+                STEAM_PORT = ev.ports[0]
+            }
+        });
+
+        // -------------------------
+
+        const steamRef = showSteamRef() ? "<div class='loadingContentBox'>" +
+            "<div style='text-align:center'>As an alternative you could </div><br />" +
+            '<a target="_blank" href="' + STEAM_LINK + '" class="loadingPageSteamLink">' +
+            "<div>" + (STEAM_RELEASED ? "PLAY ON " : "WISHLIST ON ") + "</div>" +
+            "<img src='./load/steam2.png' height=35 style=\"margin: '4px 20px 0 10px'\"/>" +
+            "</a><br /><br />" +
+            "</div>" : "";
+
+        function showErrorHtml(html, noWrapper) {
+            document.getElementById("loader")?.remove();
+            const element = document.getElementById("loadingMessage");
+            if (element) {
+                element.innerHTML = noWrapper ? html : ("<div class='loadingContentBox'>" + html + "</div> " + steamRef);
+            }
+        }
+
+        function isBrowserSupported(callback) {
+
+            /*const req = new XMLHttpRequest();
+            req.open('GET', document.location, false);
+            req.send(null);
+            const headers = req.getAllResponseHeaders().toLowerCase();
+            if (headers.indexOf("cross-origin-embedder-policy: require-corp") === -1) {
+                console.warn("Server is not configured correctly - missing header: 'cross-origin-embedder-policy: require-corp'")
+            }
+            if (headers.indexOf("cross-origin-opener-policy: same-origin") === -1) {
+                console.warn("Server is not configured correctly - missing header: 'cross-origin-opener-policy: same-origin'")
+            }*/
+
+            const checkSafari = function (callback) {
+                const args = new URL(document.location);
+                if (ALLOW_SAFARI || args.searchParams.get("firefox") === "1") {
+                    return callback(undefined);
+                }
+                const msg = "I tried hard to support Safari, but just can't. For a browser based game it uses unusually big map and safari has limitiations on this front.<br />" +
+                    "I keep regularly testing this game against Safari, as soon as it becomes playable, I will enable it. <br />" +
+                    "<span style='font-size:0.8em'>(If you happen to be an expert developer, adding ?safari=1 to URL will bypass this check.)</span><br /><br />" +
+                    "<b style='color:#2cdaff'>I kindly ask not to rate game negatively because of this. I try to add support to as many devices as possible.</b>";
+                const isSafari = navigator.userAgent.indexOf("Safari") >= 0 && !(navigator.userAgent.indexOf("Chrome") >= 0);
+                callback(isSafari ? msg : undefined);
+            }
+
+            const checkFirefox = function (callback) {
+                const args = new URL(document.location);
+                if (ALLOW_FIREFOX || args.searchParams.get("firefox") === "1") {
+                    return callback(undefined);
+                }
+                const msg = "<span>" +
+                    "<b>I tried hard to support Firefox</b>, but just can't. For a browser based game it uses unusually big maps and lots of objects - " +
+                    "all this causes issues for Firefox memory management which is not yet optimized for such workflow. " +
+                    "I keep regularly testing this game against Firefox, as soon as it becomes playable, I will enable it. " +
+                    "<span style='font-size:0.8em'>(If you happen to be an expert developer, adding ?firefox=1 to URL will bypass this check.)</span><br /><br />" +
+                    "<b style='color:#2cdaff'>I kindly ask not to rate game negatively because of this. I try to add support to as many devices as possible.</b> " +
+                    "<span style='color:#2cdaff'>I try to move browser based gaming to a next level with technically much more complex games than we currently see!</span>" +
+                    "</span>";
+                const isFirefox = navigator.userAgent.indexOf("Firefox") > -1
+                callback(isFirefox ? msg : undefined);
+            }
+
+            const checkIE = function (callback) {
+                const msg = "<b>Internet explorer</b> is really old browser and unfortunately not supported. Please consider using a newer chromium based browser (for example edge or chrome)";
+                const isIE = navigator.userAgent.search("MSIE") > -1
+                callback(isIE ? msg : undefined);
+            }
+
+            const checkCanvas = function (callback) {
+                const msg = "Browser does not support Canvas! <br />Please consider using a newer chromium based browser (for example edge or chrome)";
+                const isCanvasOk = !!(document.createElement('canvas').getContext && document.createElement('canvas').getContext('2d'));
+                callback(isCanvasOk ? undefined : msg);
+            }
+
+            const checkTransferControl = function (callback) {
+                const msg = "Browser does not support Canvas.transferControlToOffscreen!<br />Please consider using a newer chromium based browser (for example edge or chrome)";
+                const isCanvasOk = !!document.createElement('canvas').transferControlToOffscreen
+                callback(isCanvasOk ? undefined : msg);
+            }
+
+            const checkLocalStorage = function (callback) {
+                try {
+                    window.localStorage.setItem("__test", "__test")
+                    window.localStorage.removeItem("__test");
+                    callback(undefined);
+                } catch (e) {
+                    const frame = document.createElement("iframe");
+                    const site = document.location.href.indexOf(MAIN_SITE_LINK) ? SECONDARY_SITE_LINK : MAIN_SITE_LINK;
+                    frame.src = site + "/thirdPartyCookieTest.html";
+                    const listener = function (event) {
+                        if (event.data === "__THIRD_PARTY_COOKIE_TEST_OK" || event.data === "__THIRD_PARTY_COOKIE_TEST_FAILED") {
+                            frame.remove();
+                            window.removeEventListener('message', listener);
+                            if (event.data === "__THIRD_PARTY_COOKIE_TEST_OK") {
+                                callback("<b>The game is unable to use <u>local storage (cookies)</u> to save your progress.</b><br /> " +
+                                    "<span style='color:gray'>Local storage is essential to store your game progress. </span><br />" +
+                                    "It is possible that your browser settings are blocking cookies, which is causing this issue.");
+                            } else if (event.data === "__THIRD_PARTY_COOKIE_TEST_FAILED") {
+                                callback("<b>This website hosts the game in an iframe, and unfortunately, we are unable to save your progress because your browser's settings have disabled third-party cookies.</b> <br />" +
+                                    "<span style='color:gray'>Your game progress is saved using local storage, and if it is disabled, you would lose your progress.</span><br /><br />" +
+                                    "Alternatively, you can play the game on <a href='" + MAIN_SITE_LINK + "' style='color:white' target='_blank'>" + MAIN_SITE_LINK + "</a>, but please note that your progress will not be linked to this website. ");
+                            }
+                        }
+                    };
+                    window.addEventListener('message', listener);
+                    document.body.appendChild(frame);
+                }
+            }
+
+            console.log("Starting browser check");
+            const checks = [checkSafari, checkFirefox, checkIE, checkCanvas, checkTransferControl, checkLocalStorage];
+            let checksFinished = 0;
+            const errors = [];
+            for (let i = 0; i < checks.length; i++) {
+                checks[i](function (errorMsg) {
+                    checksFinished++;
+                    if (errorMsg) {
+                        errors.push(errorMsg);
+                    }
+                    if (checksFinished === checks.length) {
+                        console.log("All browser checks finished!", errors);
+                        callback(errors);
+                    }
+                });
+            }
+        }
+
+        let IS_BROWSER_OK = undefined;
+        isBrowserSupported(function (errors) {
+            if (errors.length > 0) {
+                IS_BROWSER_OK = false;
+                showErrorHtml("" +
+                    "<div class='loadingContentBox' style='text-align:center'><b style='color:red'>Unfortunately your browser does not support necessary elements for this game to run</b>.</div> " +
+                    "<div class='loadingContentBox'>" +
+                    "<span style='color:#b66df8; font-size: 16px;'>" + errors[0] + "</span>" +
+                    "</div>" +
+                    steamRef +
+                    "<div class='loadingContentBox'>" +
+                    "Officially supported browsers are chromium based browsers like <b style='color:limegreen'>Chrome, Edge and Opera</b>. Please use newer browser or consider alternatives! <br /><br />" +
+                    "If you are using one recommended, please check that it is up-to-date. If you see this message, it means some technical function that this game needs is not available.<br />" +
+                    "</div>", true);
+            } else {
+                IS_BROWSER_OK = true;
+                const timeSeconds = 60;
+                setTimeout(() => {
+                    showErrorHtml("<b style='color:red'>" + timeSeconds + " seconds have passed, it seems game is not loading properly.</b><br /><br />" +
+                        "I could not detect automatically what was the issue - you could check console for possible errors.<br />");
+                }, timeSeconds * 1000);
+            }
+        })
+
+    </script>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-D514ZEF43V"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag("config", "G-D514ZEF43V", {
+        "cookie_domain": "auto",
+        "cookie_flags": "SameSite=None; Secure",
+        "linker": {
+            "domains": [MAIN_SITE_LINK.split("//").pop(), SECONDARY_SITE_LINK.split("//").pop()]
+        }
+    });
+
+    /*
+       ga('create', 'UA-75981439-1', 'auto');
+    ga('set', 'page', '/');
+    ga('send', 'pageview');
+    setInterval(function () {
+        ga('send', 'pageview');
+    }, 1000 * 60 * 3);
+     */
+</script>
+
+</body>
+</html>
